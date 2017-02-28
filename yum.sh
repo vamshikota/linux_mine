@@ -29,8 +29,21 @@ if [[ $last_log =~ \.gz$ ]];
 		cat $last_log | awk '{print $1,$2}' | uniq | tail -1; 	
 fi;
 
-echo -e "\nLast yum update run :"
-grep -i yum /var/log/cron | awk '{print $1,$2,$6,$7}' | uniq | tail -2
+### yum cron last run
+
+echo -e "\nLast yum update cron run :"
+
+yum_cron_last_run=`mktemp`
+
+grep -i yum /var/log/cron | awk '{print $1,$2,$6,$7}' | uniq | tail -2 > $yum_cron_last_run
+
+if [[ ! -s $yum_cron_last_run ]]; then
+	echo "Nothing Returned"
+else
+	cat $yum_cron_last_run
+rm -rf $yum_cron_last_run
+fi
+
 
 echo -e "\nKernel updates :"
 echo "================="
@@ -42,7 +55,7 @@ latest_kernel_available=$(yum check-update kernel --disableexcludes=all 2>&1 | g
 
 ## is the loaded kernel the latest installed one ??
 if [[ $latest_kernel_installed == $kernel_loaded ]]; then 
-		echo -n "Server is loaded into the latest kernel installed : $latest_kernel_installed"; 
+		echo -n "Server is loaded into the latest kernel installed : "; 
 		loaded_latest_kernel_installed="yes"
 		echo $kernel_loaded; 
 	else 
