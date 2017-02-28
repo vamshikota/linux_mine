@@ -37,18 +37,12 @@ echo "================="
 
 ## Checking Kernel installed, lastest kernel installed and latest_kernel_available.
 latest_kernel_installed=$(rpm -qa | grep -i ^kernel-[0-9]| sort -rn | grep el[0-9] | head -1 | cut -d- -f2,3,4)
-#echo "latest_kernel_installed = $latest_kernel_installed"
-
 kernel_loaded=$(uname -r)
-#echo "kernel_loaded = $kernel_loaded"
-
 latest_kernel_available=$(yum check-update kernel --disableexcludes=all 2>&1 | grep ^kernel  | awk '{print $2}')
-#echo "latest_kernel_available = $latest_kernel_available"
 
 ## is the loaded kernel the latest installed one ??
-
 if [[ $latest_kernel_installed == $kernel_loaded ]]; then 
-		echo -n "Server is on the most recent kernel installed : "; 
+		echo -n "Server is loaded into the latest kernel installed : $latest_kernel_installed"; 
 		loaded_latest_kernel_installed="yes"
 		echo $kernel_loaded; 
 	else 
@@ -58,19 +52,13 @@ if [[ $latest_kernel_installed == $kernel_loaded ]]; then
 fi
 
 ## 
-
-
-#if [[ $latest_kernel_installed == $latest_kernel_available ]] && [[ $loaded_latest_kernel_installed == "yes" ]]; then 
 if [[ -z $latest_kernel_available ]]  && [[ $loaded_latest_kernel_installed == "yes" ]]; then
-	echo -e "\nServer is up-to-date"
+	echo -e "\nServer is up-to-date with kernel"
 	echo -e "And is Loaded into the Latest Kernel"
 
 elif [[ -z $latest_kernel_available ]] && [[ $loaded_latest_kernel_installed == "no" ]]; then
 	echo -e "Server has latest Kernel"
 	echo -e "But needs reboot to boot into the new kernel $latest_kernel_installed" 
-#	echo 	"Server will need a kernel update and reboot
-#		A reboot is needed anyways even if you choose not to update
-#		... As the server is not loaded from the latest kernel installed."
 
 else 
 	echo -e "\nHowever, Kernel will need update.\nLastest kenrel available is : $new_kernel" ; 
